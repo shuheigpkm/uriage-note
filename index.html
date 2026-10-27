@@ -57,6 +57,8 @@ a{color:var(--sea)}
 .pbar .track{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
 .pbar .track i{display:block;height:100%;background:var(--leaf);border-radius:3px;transition:width .4s}
 .banner .btn{white-space:nowrap;flex:none}
+.banner.warn{background:var(--ember-wash);border-color:var(--ember)}
+.banner.warn b{color:var(--ember)}
 .banner{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--sun-wash);border:1px solid var(--sun);border-radius:var(--r-m);padding:10px 12px;margin:0 0 14px;font-size:13px}
 
 .hero{background:var(--sun);color:var(--sun-ink);border-radius:var(--r-xl);padding:20px 20px 18px;margin:4px 0 18px;position:relative;overflow:hidden}
@@ -460,9 +462,14 @@ function render(){
   after();
 }
 const savedBadge=()=>mode==='demo'?'<span class="saved demo">デモ表示中</span>':`<span class="saved" id="saved">${storageOK?'この端末に自動保存':'保存できません'}</span>`;
+const UA=navigator.userAgent||'';
+const IN_APP=/\bLine\/|FBAN|FBAV|Instagram|KAKAOTALK/i.test(UA);
+const STANDALONE=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+const APP_URL='https://shuheigpkm.github.io/uriage-note/';
+const inAppBar=()=>IN_APP&&!STANDALONE?`<div class="banner warn"><span><b>LINEの中で開いています。</b>ここで入力した記録は、SafariやChromeとは別の場所に保存されます。いつものブラウザで開き直して、ホーム画面に追加してください。</span><a class="btn small" href="${APP_URL}?openExternalBrowser=1">ブラウザで開く</a></div>`:'';
 const demoBar=()=>mode==='demo'?`<div class="banner"><span>架空のデモデータです。何をしても保存されません。</span><button class="btn small" data-act="exitDemo">デモを終える</button></div>`:'';
 const header=(title,sub)=>`<header class="top"><div><div class="shop"><span>${esc(sub??S.settings.name)}</span>${savedBadge()}</div><h1>${title}</h1></div>
-  <a class="iconbtn" href="#/settings" aria-label="設定"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></a></header>${demoBar()}`;
+  <a class="iconbtn" href="#/settings" aria-label="設定"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></a></header>${inAppBar()}${demoBar()}`;
 
 /* ============ ホーム ============ */
 function vHome(){
@@ -747,7 +754,7 @@ function vSettings(){const s=S.settings,bytes=(()=>{try{return (localStorage.get
     <div class="field"><label for="s-name">店名</label><input id="s-name" value="${esc(s.name)}" placeholder="例：みやこんじょ"></div>
     <div class="grid2"><div class="field"><label for="s-seats">席数</label><input id="s-seats" type="number" inputmode="numeric" value="${s.seats??''}"></div><div class="field"><label for="s-biz">月の営業日数</label><input id="s-biz" type="number" inputmode="numeric" value="${s.bizDays??''}"></div></div>
     <div class="grid2"><div class="field"><label for="s-target">月の売上目標（円）</label><input id="s-target" type="number" inputmode="numeric" value="${s.target??''}"></div><div class="field"><label for="s-ticket">目標客単価（円）</label><input id="s-ticket" type="number" inputmode="numeric" value="${s.ticket??''}" placeholder="任意"></div></div></div>
-  <div class="panel"><h3>データの保存先</h3><p class="note" style="margin-top:0">記録はすべてこの端末の中だけに自動で保存されます。インターネットにはどこにも送られません。お客様の名刺写真もこの端末の中です。<br>
+  <div class="panel"><h3>データの保存先</h3><p class="note" style="margin-top:0"><b style="color:var(--ink)">記録は、開いているアプリ（ブラウザ）ごとに別々に保存されます。</b>LINEの中、Safari、Chromeで開くと、それぞれ別の記録になります。いつも同じ場所から開けるよう、SafariやChromeで開いてホーム画面に追加し、そのアイコンから開いてください。<br><br>記録はすべてこの端末の中だけに自動で保存されます。インターネットにはどこにも送られません。お客様の名刺写真もこの端末の中です。<br>
     いまの使用量：約${Math.round(bytes/1024)}KB（写真を除く）。スマホのブラウザの履歴やWebサイトデータを消すと、記録も消えます。</p></div>
   <div class="panel"><h3>バックアップと引っ越し</h3><div class="btns"><button class="btn" data-act="backup">バックアップを保存</button><button class="btn ghost" data-act="import">バックアップ・CSVを取り込む</button></div>
     <div class="btns" style="margin-top:8px"><button class="btn ghost small" data-act="csv">売上をCSVで保存</button><button class="btn ghost small" data-act="csvTalk">会話メモをCSVで保存</button><button class="btn ghost small" data-act="csvCust">お客様台帳をCSVで保存</button></div>
